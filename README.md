@@ -32,7 +32,7 @@ Three different architectures were used: ResNet-18, VGG-11, and DenseNet-121 fro
 
 ![3d_hyperparameter_plot](https://user-images.githubusercontent.com/118086192/215295101-2c725566-c25a-4beb-b241-5e145c0f7691.PNG)
 
-Figure 3: Plot of the batch size and learning rate hyperparameters and minimum validation loss achieved during training for ResNet-18 (Blue), VGG-11 (Green) and DenseNet-121 (Red). ResNet-18 achieved the lowest loss value, but on average DenseNet-121 achieved lower than the averages of other architectures. 
+Figure 3: Plot of the batch size, learning rate and minimum validation loss achieved during training for ResNet-18 (Blue), VGG-11 (Green) and DenseNet-121 (Red). ResNet-18 achieved the lowest loss value, but on average DenseNet-121 achieved lower than the averages of other architectures. 
 
 | Batch size  | Learning rate | Number of epochs | Optimizer | Loss          | Patience |
 | ----------- | ------------- | ---------------- | --------- | ------------- | -------- | 
