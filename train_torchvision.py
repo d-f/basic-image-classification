@@ -308,7 +308,7 @@ def save_results(
                        'test dataset': args.test_tile_csv,
                        'patience': args.patience}
 
-    json_losses = {'loss values:': plot_losses,
+    json_losses = {'loss values': plot_losses,
                    'accuracy values': plot_accuracy,
                    'val loss values': plot_val_losses,
                    'val accuracy values': plot_val_accuracy}
