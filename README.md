@@ -26,7 +26,7 @@ Figure 1: Example negative image (above).
 
 Figure 2: Example positive image (above).
 
-The images were re-sized to (100, 100) and were randomly partitioned into the training, validation and test sets.
+The images were re-sized to (224, 224) and were randomly partitioned into the training, validation and test sets.
 
 Three different architectures were used: ResNet-18, VGG-11, and DenseNet-121 from torchvision.
 
