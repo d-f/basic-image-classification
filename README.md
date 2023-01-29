@@ -40,6 +40,14 @@ Figure 3: Plot of the batch size and learning rate hyperparameters and minimum v
 
 Table 3: Batch size, learning rate, total number of training epochs, optimizer algorithm, loss function and patience for the best performing model (ResNet-18). Batch size refers to the number of inputs and gradient measurements that happen before the parameters are updated, learning rate is the proportion of the gradient that is used to update the parameters, number of training epochs are the total number of times the training goes through the entire dataset, optimizer is the algorithm used to calculate the parameter updates, loss function is the funciton used to measure the error between prediction and ground truth, and patience is the total number of epochs the training went past the model achieving a minimum validation loss value. Parameters are saved at the minimum validation loss and the model evaluated on the test set. 
 
+![resnet_model_1_accuracy_curve](https://user-images.githubusercontent.com/118086192/215297118-e7932cd4-8cc6-4066-b6b9-006799168412.png)
+
+Figure 4: Accuracy on the train and validation datasets throughout training, including the extra 5 epochs the model was trained past the minimum validation loss.
+
+![resnet_model_1_loss_curve](https://user-images.githubusercontent.com/118086192/215297135-acf8d105-ce25-4c06-a589-9cd1f1e6f15f.png)
+
+Figure 5: Loss on the train and validation datasets throughout training, including the extra 5 epochs the model was trained past the minimum validation loss.
+
 | Sensitivity (Recall) | Specificity | ROC-AUC | Accuracy | 
 | -------------------- | ----------- | ------- | -------- |  
 | 100%                 | 80%         |  0.9    | 92%      | 
