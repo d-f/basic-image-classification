@@ -62,35 +62,35 @@ def define_device() -> torch.device:
 
 
 def define_model(
-    args: argparse.Namespace,
+    architecture: str,
     device: torch.device
     ) -> models:
     """
     defines different torchvision models and replaces the classifier layer with an
     appropriatiely sized one for the number of classes in the dataset
     """
-    if args.architecture == "resnet18":
+    if architecture == "resnet18":
         model = models.resnet18()
         num_ftrs = model.fc.in_features
         model.classifier = nn.Linear(in_features=num_ftrs, out_features=args.num_classes)
         return model.to(device)
-    elif args.architecture == "vgg":
+    elif architecture == "vgg":
         model = models.vgg11_bn()
         num_ftrs = model.classifier[6].in_features
         model.classifier[6] = nn.Linear(num_ftrs, args.num_classes)
         return model.to(device)
-    elif args.architecture == "densenet":
+    elif architecture == "densenet":
         model = models.densenet121()
         num_ftrs = model.classifier.in_features
         model.classifier = nn.Linear(num_ftrs, args.num_classes)
         return model.to(device)
 
 
-def define_optimizer(model: models.efficientnet.EfficientNet, args: argparse.Namespace) -> optim.Adam:
+def define_optimizer(model: models.efficientnet.EfficientNet, learning_rate: float) -> optim.Adam:
     """
     returns the algorithm that updates the parameters
     """
-    return optim.Adam(model.parameters(), lr=args.learning_rate)
+    return optim.Adam(model.parameters(), lr=learning_rate)
 
 
 def define_criterion() -> nn.CrossEntropyLoss:
@@ -202,7 +202,10 @@ def validate_model(
 
 
 def train(
-    args: argparse.Namespace, 
+
+    num_epochs: int,
+    patience: int, 
+    model_save_name: str,
     train_dataset: ImageClassificationDataset, 
     train_loader: torch.utils.data.DataLoader, 
     val_dataset: ImageClassificationDataset, 
@@ -225,8 +228,8 @@ def train(
     plot_accuracy = []
     plot_val_accuracy = []
 
-    for epoch in range(args.num_epochs):
-        if patience_counter == args.patience:
+    for epoch in range(num_epochs):
+        if patience_counter == patience:
             break  # early stopping
         losses = []
         val_losses = []
@@ -261,13 +264,13 @@ def train(
         if epoch == 0:
             min_val_loss = (sum(val_losses) / len(val_losses))
             best_checkpoint = checkpoint
-            save_checkpoint(state=best_checkpoint, filepath=model_save_dir.joinpath(args.model_save_name))
+            save_checkpoint(state=best_checkpoint, filepath=model_save_dir.joinpath(model_save_name))
             patience_counter += 1
         else:
             new_loss = (sum(val_losses) / len(val_losses))
             if new_loss < min_val_loss:
                 best_checkpoint = checkpoint
-                save_checkpoint(state=best_checkpoint, filepath=model_save_dir.joinpath(args.model_save_name))
+                save_checkpoint(state=best_checkpoint, filepath=model_save_dir.joinpath(model_save_name))
                 min_val_loss = (sum(val_losses) / len(val_losses))
                 patience_counter = 0
             else:
@@ -288,7 +291,12 @@ def train(
 
 
 def save_results(
-        args: argparse.Namespace, 
+        batch_size: int,
+        model_save_name: str,
+        train_tile_csv: str,
+        val_tile_csv: str,
+        test_tile_csv: str, 
+        patience: int,
         plot_losses: List, 
         plot_val_losses: List, 
         plot_accuracy: List,
@@ -300,23 +308,23 @@ def save_results(
     saves the results of training and hyperparameters into json files
     """
     # save hyperparameter configurations
-    hyperparameters = {'batch size': args.batch_size,
-                       'model save name': args.model_save_name,
+    hyperparameters = {'batch size': batch_size,
+                       'model save name': model_save_name,
                        'optimizer': optimizer.defaults, 
-                       'train dataset': args.train_tile_csv,
-                       'validation dataset': args.val_tile_csv,
-                       'test dataset': args.test_tile_csv,
-                       'patience': args.patience}
+                       'train dataset': train_tile_csv,
+                       'validation dataset': val_tile_csv,
+                       'test dataset': test_tile_csv,
+                       'patience': patience}
 
     json_losses = {'loss values': plot_losses,
                    'accuracy values': plot_accuracy,
                    'val loss values': plot_val_losses,
                    'val accuracy values': plot_val_accuracy}
 
-    with open(f'{result_dir.joinpath(args.model_save_name[:-8])}_hyperparameters.json', 'w') as outfile:
+    with open(f'{result_dir.joinpath(model_save_name[:-8])}_hyperparameters.json', 'w') as outfile:
         json.dump(hyperparameters, outfile)
 
-    with open(f'{result_dir.joinpath(args.model_save_name[:-8])}_loss_values.json', 'w') as outfile:
+    with open(f'{result_dir.joinpath(model_save_name[:-8])}_loss_values.json', 'w') as outfile:
         json.dump(json_losses, outfile)
 
 
@@ -330,19 +338,40 @@ def main():
         )
 
     device = define_device()
-    model = define_model(args=args, device=device)
-    optimizer = define_optimizer(model=model, args=args)
+    model = define_model(architecture=args.architecture, device=device)
+    optimizer = define_optimizer(model=model, learning_rate=args.learning_rate)
     criterion = define_criterion()
 
     plot_losses, plot_val_losses, plot_accuracy, plot_val_accuracy = train(
-        args=args, train_dataset=train_dataset, train_loader=train_loader, val_dataset=val_dataset,
-        val_loader=val_loader, model=model, optimizer=optimizer, device=device, criterion=criterion, model_save_dir=args.project_directory.joinpath("models")
+        nun_epochs=args.num_epochs, 
+        patience=args.patience, 
+        model_save_name=args.model_save_name, 
+        train_dataset=train_dataset, 
+        train_loader=train_loader, 
+        val_dataset=val_dataset, 
+        val_loader=val_loader, 
+        model=model, 
+        optimizer=optimizer, 
+        device=device, 
+        criterion=criterion, 
+        model_save_dir=args.project_directory.joinpath("models")
     )
     save_results(
-        args=args, plot_losses=plot_losses, plot_val_losses=plot_val_losses, plot_accuracy=plot_accuracy,
-        plot_val_accuracy=plot_val_accuracy, result_dir=args.project_directory.joinpath("results"), optimizer=optimizer
+        batch_size=args.batch_size, 
+        model_save_name=args.model_save_name,
+        train_tile_csv=args.train_tile_csv,
+        val_tile_csv=args.val_tile_csv,
+        test_tile_csv=args.test_tile_csv,
+        patience=args.patience,
+        plot_losses=plot_losses, 
+        plot_val_losses=plot_val_losses, 
+        plot_accuracy=plot_accuracy,
+        plot_val_accuracy=plot_val_accuracy, 
+        result_dir=args.project_directory.joinpath("results"), 
+        optimizer=optimizer
     )
 
 
 if __name__ == "__main__":
     main()
+    
