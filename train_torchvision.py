@@ -6,7 +6,6 @@ import torch.optim as optim
 import torchvision.models as models
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-import pandas as pd
 from torch.utils.data import Dataset
 from tqdm import tqdm
 import json
@@ -45,6 +44,9 @@ def create_argparser() -> argparse.Namespace:
     parser.add_argument("-img_shape", type=tuple, nargs="+") 
     # architecture to use
     parser.add_argument("-architecture", type=str)
+    # if set to true, this argument uses the GPU
+    # to set as true use --use_GPU in CLI
+    parser.add_argument("-use_GPU", action="store_true")
     return parser.parse_args()
 
 
@@ -54,15 +56,19 @@ def read_csv(csv_path: Path) -> List:
         return [x for x in reader]
 
 
-def define_device() -> torch.device:
+def define_device(use_GPU: bool) -> torch.device:
     """
     defines device to manage allocation of tensors
     """
-    return torch.device("cpu")
+    if use_GPU:
+        return torch.device("cuda")
+    else:
+        return torch.device("cpu")
 
 
 def define_model(
     architecture: str,
+    num_classes: int,
     device: torch.device
     ) -> models:
     """
@@ -72,18 +78,20 @@ def define_model(
     if architecture == "resnet18":
         model = models.resnet18()
         num_ftrs = model.fc.in_features
-        model.classifier = nn.Linear(in_features=num_ftrs, out_features=args.num_classes)
+        model.fc = nn.Linear(in_features=num_ftrs, out_features=num_classes)
         return model.to(device)
+        
     elif architecture == "vgg":
         model = models.vgg11_bn()
         num_ftrs = model.classifier[6].in_features
-        model.classifier[6] = nn.Linear(num_ftrs, args.num_classes)
+        model.classifier[6] = nn.Linear(num_ftrs, num_classes)
         return model.to(device)
     elif architecture == "densenet":
         model = models.densenet121()
         num_ftrs = model.classifier.in_features
-        model.classifier = nn.Linear(num_ftrs, args.num_classes)
+        model.classifier = nn.Linear(num_ftrs, num_classes)
         return model.to(device)
+        
 
 
 def define_optimizer(model: models.efficientnet.EfficientNet, learning_rate: float) -> optim.Adam:
@@ -122,9 +130,9 @@ class ImageClassificationDataset(Dataset):
     def __len__(self) -> None:
         return len(self.dataset_tuples)
 
-    def __getitem__(self, index: int) -> tuple[torch.tensor, torch.tensor, str]:
-        y_label = torch.tensor(int(self.dataset_tuples.iloc[index, 1]))  
-        img_path = self.img_dir.joinpath(self.dataset_tuples.iloc[index, 0])  
+    def __getitem__(self, index: int) -> tuple[torch.tensor, torch.tensor]:
+        y_label = torch.tensor(int(self.dataset_tuples[index][1]))  
+        img_path = self.img_dir.joinpath(self.dataset_tuples[index][0])  
         image = Image.open(img_path)
         if self.transform:
             image = self.transform(image)
@@ -202,7 +210,6 @@ def validate_model(
 
 
 def train(
-
     num_epochs: int,
     patience: int, 
     model_save_name: str,
@@ -337,13 +344,13 @@ def main():
         val_file_path=args.project_directory.joinpath("csv").joinpath(args.val_tile_csv)
         )
 
-    device = define_device()
-    model = define_model(architecture=args.architecture, device=device)
+    device = define_device(use_GPU=args.use_GPU)
+    model = define_model(architecture=args.architecture, num_classes=args.num_classes, device=device)
     optimizer = define_optimizer(model=model, learning_rate=args.learning_rate)
     criterion = define_criterion()
 
     plot_losses, plot_val_losses, plot_accuracy, plot_val_accuracy = train(
-        nun_epochs=args.num_epochs, 
+        num_epochs=args.num_epochs, 
         patience=args.patience, 
         model_save_name=args.model_save_name, 
         train_dataset=train_dataset, 
