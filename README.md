@@ -94,9 +94,9 @@ Figure 4: Accuracy on the train and validation datasets throughout training, inc
 
 Figure 5: Loss on the train and validation datasets throughout training, including the extra 5 epochs the model was trained past the minimum validation loss.
 
-| Sensitivity (Recall) | Specificity | ROC-AUC | Accuracy | 
-| -------------------- | ----------- | ------- | -------- |  
-| 90.00 %              | 93.75 %     |  1.0    | 92.31 %  | 
+| Sensitivity (Recall) | Specificity | ROC-AUC | Accuracy | Cohen's Kappa |
+| -------------------- | ----------- | ------- | -------- | ------------- |
+| 90.00 %              | 93.75 %     |  1.0    | 92.31 %  | 0.8375        |
 
 Table 4: Model performance on the test dataset.
 
