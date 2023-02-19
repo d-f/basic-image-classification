@@ -72,6 +72,7 @@ Figure 1: Example negative image (above).
 Figure 2: Example positive image (above).
 
 The images were re-sized to (224, 224) and were randomly partitioned into the training, validation and test sets.
+Since the dataset contains a mixture of single and multi-channel images, all are converted to grayscale multi-channel images.
 
 Three different architectures were used: [ResNet-18](https://arxiv.org/abs/1512.03385), [VGG-11](https://arxiv.org/abs/1409.1556), and [DenseNet-121](https://arxiv.org/abs/1608.06993) from [torchvision](https://pytorch.org/vision/0.8/models.html).
 
