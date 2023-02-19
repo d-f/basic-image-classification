@@ -30,18 +30,10 @@ def create_argparser() -> argparse.Namespace:
     # number of images to take feed into the model before 
     # measuring gradient and updating parameters
     parser.add_argument("-batch_size", type=int)
-    # proportion of connections in the last layer of the network to randomly omit
-    parser.add_argument("-drop_out", type=float)
     # name of the model being trained e.g. model.pth.tar
     parser.add_argument("-model_save_name", type=str)  
-    # name of training csv with name of images and class
-    parser.add_argument("-train_tile_csv", type=str)  
-    # name of validation csv with name of images and class
-    parser.add_argument("-val_tile_csv", type=str) 
-    # name of test csv with name of images and class
-    parser.add_argument("-test_tile_csv", type=str) 
     # shape of the input image -> channels first for PyTorch
-    parser.add_argument("-img_shape", type=tuple, nargs="+") 
+    parser.add_argument("-img_shape", type=list, nargs="+") 
     # architecture to use
     parser.add_argument("-architecture", type=str)
     # if set to true, this argument uses the GPU
@@ -122,10 +114,11 @@ class ImageClassificationDataset(Dataset):
     dataset reads filenames and classes
     from csv and returns an opened image and the class
     """
-    def __init__(self, csv_file: Path, img_dir: Path, transform=None) -> None:
+    def __init__(self, csv_file: Path, img_dir: Path, transform=None, resize=None) -> None:
         self.dataset_tuples = read_csv(csv_path=csv_file) # (file name, class)
         self.img_dir = img_dir
         self.transform = transform
+        self.resize = resize
 
     def __len__(self) -> None:
         return len(self.dataset_tuples)
@@ -133,10 +126,20 @@ class ImageClassificationDataset(Dataset):
     def __getitem__(self, index: int) -> tuple[torch.tensor, torch.tensor]:
         y_label = torch.tensor(int(self.dataset_tuples[index][1]))  
         img_path = self.img_dir.joinpath(self.dataset_tuples[index][0])  
-        image = Image.open(img_path)
+        image = Image.open(img_path).convert("RGB")
+        # convert [["2", "2", "4"], ["2", "2", "4"]]
+        # to (224, 224)
+        resize_formatted_tuple = (strings_to_int(x) for x in self.resize)
+        if self.resize:
+            image = image.resize(size=resize_formatted_tuple)
         if self.transform:
             image = self.transform(image)
         return image, y_label
+
+    
+def strings_to_int(string_list: list) -> int:
+    empty_string = ""
+    return int(empty_string.join(string_list))
 
 
 def save_checkpoint(state: Dict, filepath: Path) -> None:
@@ -148,7 +151,8 @@ def save_checkpoint(state: Dict, filepath: Path) -> None:
 
 
 def create_datasets(
-    args: argparse.Namespace, 
+    img_size: tuple,
+    batch_size: int,
     train_file_path: Path, 
     img_dir: Path, 
     val_file_path: Path
@@ -169,17 +173,19 @@ def create_datasets(
         img_dir=img_dir,
         transform=transforms.Compose([
             transforms.ToTensor(),
-        ])
+        ]),
+        resize=img_size[1:]
     )
     val_dataset = ImageClassificationDataset(
         csv_file=val_file_path,
         img_dir=img_dir,
         transform=transforms.Compose([
             transforms.ToTensor(),
-        ])
+        ]),
+        resize=img_size[1:]
     )
-    train_loader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, shuffle=True)
-    val_loader = DataLoader(dataset=val_dataset, batch_size=args.batch_size, shuffle=False)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False)
 
     return train_dataset, train_loader, val_dataset, val_loader
 
@@ -302,7 +308,6 @@ def save_results(
         model_save_name: str,
         train_tile_csv: str,
         val_tile_csv: str,
-        test_tile_csv: str, 
         patience: int,
         plot_losses: List, 
         plot_val_losses: List, 
@@ -320,7 +325,6 @@ def save_results(
                        'optimizer': optimizer.defaults, 
                        'train dataset': train_tile_csv,
                        'validation dataset': val_tile_csv,
-                       'test dataset': test_tile_csv,
                        'patience': patience}
 
     json_losses = {'loss values': plot_losses,
@@ -338,10 +342,11 @@ def save_results(
 def main():
     args = create_argparser()
     train_dataset, train_loader, val_dataset, val_loader = create_datasets(
-        args, 
-        train_file_path=args.project_directory.joinpath('csv').joinpath(args.train_tile_csv), 
+        batch_size=args.batch_size,
+        img_size=args.img_shape,
+        train_file_path=args.project_directory.joinpath('csv').joinpath("train.csv"), 
         img_dir=args.project_directory.joinpath('bin'), 
-        val_file_path=args.project_directory.joinpath("csv").joinpath(args.val_tile_csv)
+        val_file_path=args.project_directory.joinpath("csv").joinpath("val.csv")
         )
 
     device = define_device(use_GPU=args.use_GPU)
@@ -366,9 +371,8 @@ def main():
     save_results(
         batch_size=args.batch_size, 
         model_save_name=args.model_save_name,
-        train_tile_csv=args.train_tile_csv,
-        val_tile_csv=args.val_tile_csv,
-        test_tile_csv=args.test_tile_csv,
+        train_tile_csv="train.csv",
+        val_tile_csv="val.csv",
         patience=args.patience,
         plot_losses=plot_losses, 
         plot_val_losses=plot_val_losses, 
@@ -381,4 +385,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+
     
