@@ -25,15 +25,15 @@ def create_argparser() -> argparse.Namespace:
     parser.add_argument("-batch_size", "--batch_size", type=int) 
     # name of the model being trained e.g. model.pth.tar
     parser.add_argument("-save", "--model_load_name", type=str)
-    # name of csv with name of test image names and classes
-    parser.add_argument("-test_csv", "--test_csv", type=str)
     # one of {"resnet18", "vgg", "densenet"}
-    parser.add_argument("-architecture", default="vgg") 
+    parser.add_argument("-architecture", type=str) 
     # name of the JSON file to save the results to
-    parser.add_argument("-result_json_name", default=str)
+    parser.add_argument("-result_json_name", type=str)
     # if set to true, this argument uses the GPU
     # to set as true use --use_GPU in CLI 
     parser.add_argument("-use_GPU", action="store_true")
+    # size that the images will be resized to
+    parser.add_argument("-img_size", nargs="+")
     
     return parser.parse_args()
 
@@ -88,10 +88,11 @@ class ImageClassificationDataset(Dataset):
     from csv and returns an opened image, the class and the filename
     '''
 
-    def __init__(self, csv_file, root_dir, transform=None):
+    def __init__(self, csv_file, root_dir, transform=None, resize=None):
         self.annotations = pd.read_csv(csv_file, header=None)
         self.root_dir = root_dir
         self.transform = transform
+        self.resize = resize
         
 
     def __len__(self):
@@ -101,14 +102,24 @@ class ImageClassificationDataset(Dataset):
         y_label = torch.tensor(int(self.annotations.iloc[index, 1]))  # 2nd column is label integer
         img_path = self.root_dir.joinpath(
             self.annotations.iloc[index, 0])  # row i column 0 since its the column with name in csv file
-        image = Image.open(img_path)
+        image = Image.open(img_path).convert("RGB")
+        # convert [["2", "2", "4"], ["2", "2", "4"]]
+        # to (224, 224)
+        resize_formatted_tuple = (strings_to_int(x) for x in self.resize)
+        if self.resize:
+            image = image.resize(size=resize_formatted_tuple)
         if self.transform:
             image = self.transform(image)
 
         return image, y_label
 
 
-def create_datasets(batch_size: int, test_file_path: Path, root_dir: Path) -> torch.utils.data.DataLoader:
+def strings_to_int(string_list: list) -> int:
+    empty_string = ""
+    return int(empty_string.join(string_list))
+
+
+def create_datasets(batch_size: int, test_file_path: Path, root_dir: Path, img_size: tuple) -> torch.utils.data.DataLoader:
     '''
     reads dataset mean and standard deviation for each channel
     creates the datasets and returns dataloaders
@@ -119,7 +130,8 @@ def create_datasets(batch_size: int, test_file_path: Path, root_dir: Path) -> to
         root_dir=root_dir,
         transform=transforms.Compose([
             transforms.ToTensor(),
-        ])
+        ]),
+        resize=img_size[1:]
     )
     return DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
@@ -148,7 +160,7 @@ def test_best_model(
     model: models, 
     model_save_dir: Path, 
     device: torch.device
-    ) -> tuple(list, list, list, list):
+    ) -> tuple([list, list, list, list]):
     """
     evaluates best performing model on test set
     as dictated by best_checkpoint based on individual
@@ -188,8 +200,9 @@ def main():
     args = create_argparser()
     test_loader = create_datasets(
         batch_size=args.batch_size,
-        test_file_path=args.project_directory.joinpath('csv').joinpath(args.test_csv), 
-        root_dir=args.project_directory.joinpath('bin')
+        test_file_path=args.project_directory.joinpath('csv').joinpath("test.csv"), 
+        root_dir=args.project_directory.joinpath('bin'),
+        img_size=args.img_size
         )
     device = define_device(use_GPU=args.use_GPU)
     model = define_model(num_classes=args.num_classes, architecture=args.architecture, device=device)
