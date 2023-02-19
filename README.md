@@ -12,6 +12,39 @@ In order to run and re-create the results presented:
   conda activate basic_img_env
   pip install -r C:\basic_img_classification\requirements.txt
   ```
+- **Create dataset CSV files**
+  - Run "partition_datasets.py" to create CSV files for PyTorch dataset/ dataloader creation. This needs to be done before the bash / powershell scripts are run since they rely on determining image class via folder location (e.g. "yes" vs "no").
+  ```
+  python C:\basic_img_classification\partition_datasets.py -proj_dir C:\kaggle_brain_classification -val_test_prop 0.1 -num_classes 2
+  ```
+- **Organize images**
+  - Depending on the OS, run organize_files.ps1 or organize_files.sh to organize images, create folders and organize csv files
+  ```
+  C:\basic_img_classification\organize_files.ps1 "C:\kaggle_brain_classification\"
+  ```
+  or 
+  ```
+  /basic_img_classification/organize_files.sh
+  "/basic_img_classification/"
+  ```
+- **Train model**
+  - Run "train_torchvision.py" --use_GPU sets use_GPU as true, ommiting this argument sets use_GPU as False
+  ```
+    python C:\basic_img_classification\train_torchvision.py -project_directory C:\kaggle_brain_classification\ -num_epochs 256 -num_classes 2 -learning_rate 0.001 -patience 5 -batch_size 25 -model_save_name resnet_1.pth.tar -img_shape 3 224 224 -architecture resnet18 --use_GPU
+  ```
+- **Test model**
+  - Run "test_torchvision.py"
+  ```
+    python C:\basic_img_classification\test_torchvision.py -dir C:\kaggle_brain_classification\ -classes 2 -batch_size 100 -save resnet_1.pth.tar -architecture resnet18 -result_json_name resnet_1_preds.json -img_size 3 224 224 --use_GPU
+  ```
+- **Calculate model performance**
+  - Run "calc_model_performance.R", in this case for a model prediction file named resnet_1_preds.json and a performance json to be named "resnet_1_results.json"
+  ```
+    Rscript C:\basic_img_classification\calc_model_performance.R
+    C:\kaggle_brain_classification\resnet_1_preds.json
+    C:\kaggle_brain_classification\resnet_1_results.json
+  ```
+- **Results:**  
 [Disclaimer]: It should be noted that this model was trained / evaluated on 253 images and even though it shows impressive performance, it can't be assumed the model will work the same in a clinical setting without developing a larger dataset with as little bias introduced as possible. This is also meant to be as simple of an example as possible and doesn't include data augmentation, channel-wise pixel centering and normalization, transfer learning, fine tuning, inspecting model predictions via Grad-CAM / saliency maps / visualizing attention, measuring model uncertainty via Monte Carlo simulations or using modern architectures such as EfficientNet or Vision Transformers.
 
 A small dataset from Kaggle was used to train convolutional neural networks to classify brain MRI images as having a malignancy or not. 
