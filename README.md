@@ -4,8 +4,7 @@ This is an example of image classification with PyTorch.
 
 In order to run and re-create the results presented:
 - **Set up environment:**
-  - Download kaggle dataset to a directory, in this example C:\kaggle_brain_classification\
-  https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection
+  - Download [kaggle dataset](https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection) to a directory, in this example C:\kaggle_brain_classification\
   - Clone the basic-image-classification repository to a directory, in this case C:\basic_img_classification\
   - Create conda environment, in this case named basic_img_env
   ```
@@ -47,7 +46,7 @@ In order to run and re-create the results presented:
   ```
 ***Results of the best performing model presented below:***
 
-[Disclaimer]: It should be noted that this model was trained / evaluated on 253 images and even though it shows impressive performance, it can't be assumed the model will work the same in a clinical setting without developing a larger dataset with as little bias introduced as possible. This is also meant to be as simple of an example as possible and doesn't include data augmentation, channel-wise pixel centering and normalization, transfer learning, fine tuning, inspecting model predictions via Grad-CAM / saliency maps / visualizing attention, measuring model uncertainty via Monte Carlo simulations or using modern architectures such as EfficientNet or Vision Transformers.
+[Disclaimer]: It should be noted that this model was trained / evaluated on 253 images and even though it shows impressive performance, it can't be assumed the model will work the same in a clinical setting without developing a larger dataset with as little bias introduced as possible. This is also meant to be as simple of an example as possible and doesn't include data augmentation, channel-wise pixel centering and normalization, transfer learning, fine tuning, inspecting model predictions via [Grad-CAM](https://arxiv.org/abs/1610.02391) or [visualizing attention](https://arxiv.org/abs/2010.11929), measuring model uncertainty via  [Monte Carlo simulations](https://arxiv.org/pdf/1506.02142.pdf) or using modern architectures such as [EfficientNet](https://arxiv.org/abs/1905.11946) or [Vision Transformers](https://arxiv.org/abs/2010.11929).
 
 A small dataset from Kaggle was used to train convolutional neural networks to classify brain MRI images as having a malignancy or not. 
 https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection
@@ -74,7 +73,7 @@ Figure 2: Example positive image (above).
 
 The images were re-sized to (224, 224) and were randomly partitioned into the training, validation and test sets.
 
-Three different architectures were used: ResNet-18, VGG-11, and DenseNet-121 from torchvision.
+Three different architectures were used: [ResNet-18](https://arxiv.org/abs/1512.03385), [VGG-11](https://arxiv.org/abs/1409.1556), and [DenseNet-121](https://arxiv.org/abs/1608.06993) from [torchvision](https://pytorch.org/vision/0.8/models.html).
 
 ![3d_hyperparameter_plot](https://user-images.githubusercontent.com/118086192/215295101-2c725566-c25a-4beb-b241-5e145c0f7691.PNG)
 
