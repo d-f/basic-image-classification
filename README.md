@@ -1,6 +1,17 @@
 # basic-image-classification
 
 This is an example of image classification with PyTorch. 
+
+In order to run and re-create the results presented:
+- **Set up environment:**
+  - Download kaggle dataset to a directory, in this example C:\kaggle_brain_classification\
+  - Clone the basic-image-classification repository to a directory, in this case C:\basic_img_classification\
+  - Create conda environment, in this case named basic_img_env
+  ```
+  conda create -n basic_img_env python=3
+  conda activate basic_img_env
+  pip install -r C:\basic_img_classification\requirements.txt
+  ```
 [Disclaimer]: It should be noted that this model was trained / evaluated on 253 images and even though it shows impressive performance, it can't be assumed the model will work the same in a clinical setting without developing a larger dataset with as little bias introduced as possible. This is also meant to be as simple of an example as possible and doesn't include data augmentation, channel-wise pixel centering and normalization, transfer learning, fine tuning, inspecting model predictions via Grad-CAM / saliency maps / visualizing attention, measuring model uncertainty via Monte Carlo simulations or using modern architectures such as EfficientNet or Vision Transformers.
 
 A small dataset from Kaggle was used to train convolutional neural networks to classify brain MRI images as having a malignancy or not. 
