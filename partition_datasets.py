@@ -1,6 +1,6 @@
 import csv
 import random
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from pathlib import Path
 import argparse
 
@@ -35,9 +35,13 @@ def add_to_dict(part_dict: Dict, class_idx: int, sample_list: List) -> Dict:
 def delete_sample(class_dict: Dict, sample_list: List, class_idx: int) -> Dict:
     class_dict[class_idx] = [x for x in class_dict[class_idx] if x not in sample_list]
     return class_dict
+ 
 
-
-def partition_datasets(val_test_prop: float, class_dict: Dict, num_classes: int) -> tuple([Dict, Dict, Dict]):
+def partition_datasets(
+    val_test_prop: float, 
+    class_dict: Dict, 
+    num_classes: int
+    ) -> tuple([Dict, Dict, Dict]):
     val_dict = {0: [], 1: []}
     test_dict = {0: [], 1: []}
 
