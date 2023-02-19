@@ -1,3 +1,4 @@
+#!/usr/bin/Rscript
 library("rjson")
 library("caret")
 library("ROCR")
@@ -49,13 +50,15 @@ print_results <- function(accuracy, sensitivity, specificity, roc_auc, cks) {
   print(c("Cophen's Kappa", cks))
 }
 
-calc_results <- function(test_json_path, perf_json_filename) {
+calc_results <- function(test_json_path, perf_json_path) {
   
   opened_json = read_json(json_path=test_json_path)
   targets <- factor(c(opened_json[["labels"]]))
   preds <- factor(c(opened_json[["predictions"]]))
   pred_probs <- opened_json[["predictive probabilities"]]
   label_probs <- opened_json[["label probabilities"]]
+  print(opened_json)
+  print(targets)
   cm <- confusionMatrix(data=preds, reference=targets)
   print(cm)
   accuracy <- parse_accuracy(cm = cm)
@@ -68,7 +71,8 @@ calc_results <- function(test_json_path, perf_json_filename) {
     sensitivity = sensitivity,
     specificity = specificity,
     roc_auc = roc_auc,
-    filename = perf_json_filename
+    filename = perf_json_path,
+    cks=cks
   )
   print_results(
     accuracy = accuracy,
@@ -80,11 +84,13 @@ calc_results <- function(test_json_path, perf_json_filename) {
 }    
 
 main <- function() {
+  args = commandArgs(trailingOnly=TRUE)
   calc_results(
-    test_json_path = "",
-    perf_json_filename = ""
+    # path to JSON file from model testing
+    test_json_path = args[1], 
+    # path to JSON file that contains performance results
+    perf_json_path = args[2] 
   )
 }
 
 main()
-
