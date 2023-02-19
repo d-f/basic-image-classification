@@ -96,7 +96,7 @@ Figure 5: Loss on the train and validation datasets throughout training, includi
 
 | Sensitivity (Recall) | Specificity | ROC-AUC | Accuracy | 
 | -------------------- | ----------- | ------- | -------- |  
-| 100%                 | 80%         |  0.9    | 92%      | 
+| 90.00%               | 93.75%      |  1.0    | 92.31%   | 
 
 Table 4: Model performance on the test dataset.
 
