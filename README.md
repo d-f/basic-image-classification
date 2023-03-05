@@ -48,7 +48,7 @@ In order to run and re-create the results presented:
 
 ***[Disclaimer]***: It should be noted that this model was trained / evaluated on 253 images and even though it shows impressive performance, it can't be assumed the model will work the same in a clinical setting without developing a larger dataset with as little bias introduced as possible. This is also meant to be as simple of an example as possible and doesn't include data augmentation, channel-wise pixel centering and normalization, transfer learning, fine tuning, inspecting model predictions via [Grad-CAM](https://arxiv.org/abs/1610.02391) or [visualizing attention](https://arxiv.org/abs/2010.11929), measuring model uncertainty via  [Monte Carlo simulations](https://arxiv.org/pdf/1506.02142.pdf) or using modern architectures such as [EfficientNet](https://arxiv.org/abs/1905.11946) or [Vision Transformers](https://arxiv.org/abs/2010.11929).
 
-A small dataset from Kaggle was used to train convolutional neural networks to classify brain MRI images as having a malignancy or not. 
+A small dataset from Kaggle was used to train convolutional neural networks to classify brain MRI images as containing a malignancy or not. 
 https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection
 
 | Number of training images  | Number of validation images | Number of test images |
