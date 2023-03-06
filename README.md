@@ -4,45 +4,47 @@ This is an example of image classification with PyTorch.
 
 In order to run and re-create the results presented:
 - **Set up environment:**
-  - Download and extract the [kaggle dataset](https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection) to a directory, in this example C:\kaggle_brain_classification\
-  - Clone the basic-image-classification repository to a directory, in this case C:\basic_img_classification\
-  - Create conda environment, in this case named basic_img_env
+  - Download and extract the [kaggle dataset](https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection) to a directory, in this example C:\mlprojects\kaggle_brain_classification\
+  - Clone the basic-image-classification repository to a directory, in this case C:\mlprojects\
+  - Create conda environment, in this case named basic_image_env
   ```
-  conda create -n basic_img_env python=3
-  conda activate basic_img_env
-  pip install -r C:\basic_img_classification\requirements.txt
+  cd C:\mlprojects\
+  git clone https://github.com/d-f/basic-image-classification.git
+  conda create -n basic_image_env python=3
+  conda activate basic_image_env
+  pip install -r C:\mlprojects\basic_image_classification\requirements.txt
   ```
 - **Create dataset CSV files**
   - Run "partition_datasets.py" to create CSV files for PyTorch dataset/ dataloader creation. This needs to be done before the bash / powershell scripts are run since they rely on determining image class via folder location (e.g. "yes" vs "no").
   ```
-  python C:\basic_img_classification\partition_datasets.py -proj_dir C:\kaggle_brain_classification -val_test_prop 0.1 -num_classes 2
+  python C:\mlprojects\basic_image_classification\partition_datasets.py -proj_dir C:\mlprojects\kaggle_brain_classification -val_test_prop 0.1 -num_classes 2
   ```
 - **Organize images**
   - Depending on the OS, run organize_files.ps1 or organize_files.sh to organize images, create folders and organize csv files
   ```
-  C:\basic_img_classification\organize_files.ps1 "C:\kaggle_brain_classification\"
+  C:\mlprojects\basic_image_classification\organize_files.ps1 "C:\mlprojects\kaggle_brain_classification\"
   ```
   or 
   ```
-  /basic_img_classification/organize_files.sh
-  "/basic_img_classification/"
+  /mlprojects/basic_image_classification/organize_files.sh
+  "/mlprojects/basic_image_classification/"
   ```
 - **Train model**
   - Run "train_torchvision.py" --use_GPU sets use_GPU as true, ommiting this argument sets use_GPU as False
   ```
-    python C:\basic_img_classification\train_torchvision.py -project_directory C:\kaggle_brain_classification\ -num_epochs 256 -num_classes 2 -learning_rate 0.001 -patience 5 -batch_size 25 -model_save_name resnet_1.pth.tar -img_shape 3 224 224 -architecture resnet18 --use_GPU
+    python C:\mlprojects\basic_image_classification\train_torchvision.py -project_directory C:\mlprojects\kaggle_brain_classification\ -num_epochs 256 -num_classes 2 -learning_rate 0.001 -patience 5 -batch_size 25 -model_save_name resnet_1.pth.tar -img_shape 3 224 224 -architecture resnet18 --use_GPU
   ```
 - **Test model**
   - Run "test_torchvision.py"
   ```
-    python C:\basic_img_classification\test_torchvision.py -dir C:\kaggle_brain_classification\ -classes 2 -batch_size 100 -save resnet_1.pth.tar -architecture resnet18 -result_json_name resnet_1_preds.json -img_size 3 224 224 --use_GPU
+    python C:\mlprojects\basic_image_classification\test_torchvision.py -dir C:\mlprojects\kaggle_brain_classification\ -classes 2 -batch_size 100 -save resnet_1.pth.tar -architecture resnet18 -result_json_name resnet_1_preds.json -img_size 3 224 224 --use_GPU
   ```
 - **Calculate model performance**
   - Run "calc_model_performance.R", in this case for a model prediction file named resnet_1_preds.json and a performance json to be named "resnet_1_results.json"
   ```
-    Rscript C:\basic_img_classification\calc_model_performance.R
-    C:\kaggle_brain_classification\resnet_1_preds.json
-    C:\kaggle_brain_classification\resnet_1_results.json
+    Rscript C:\mlprojects\basic_image_classification\calc_model_performance.R
+    C:\mlprojects\kaggle_brain_classification\resnet_1_preds.json
+    C:\mlprojects\kaggle_brain_classification\resnet_1_results.json
   ```
 ***Results of the best performing model presented below:***
 
