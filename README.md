@@ -4,6 +4,7 @@ This is an example of image classification with PyTorch.
 
 In order to run and re-create the results presented:
 - **Set up environment:**
+  - Download Anaconda [https://www.anaconda.com/download](https://www.anaconda.com/download)
   - Download and extract the kaggle dataset [https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection](https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection) to a directory, in this example C:\mlprojects\kaggle_brain_classification\
   - Clone the basic-image-classification repository to a directory, in this case C:\mlprojects\
   - Create conda environment, in this case named basic_image_env
