@@ -40,7 +40,7 @@ In order to run and re-create the results presented:
   ```
     python C:\mlprojects\basic_image_classification\test_torchvision.py -dir C:\mlprojects\kaggle_brain_classification\ -classes 2 -batch_size 100 -save resnet_1.pth.tar -architecture resnet18 -result_json_name resnet_1_preds.json -img_size 3 224 224 --use_GPU
   ```
-- **Calculate model performance**
+- **Calculate model performance (may need to add R to PATH)**
   - Run "calc_model_performance.R", in this case for a model prediction file named resnet_1_preds.json and a performance json to be named "resnet_1_results.json"
   ```
     Rscript C:\mlprojects\basic_image_classification\calc_model_performance.R
