@@ -13,7 +13,7 @@ In order to run and re-create the results presented:
   git clone https://github.com/d-f/basic-image-classification.git
   conda create -n basic_image_env python=3
   conda activate basic_image_env
-  pip install -r C:\mlprojects\basic_image_classification\requirements.txt
+  pip install -r C:\mlprojects\basic_image_classification\requirements.txt --find-links https://download.pytorch.org/whl/torch_stable.html
   ```
 - **Create dataset CSV files**
   - Run "partition_datasets.py" to create CSV files for PyTorch dataset/ dataloader creation. This needs to be done before the bash / powershell scripts are run since they rely on determining image class via folder location (e.g. "yes" vs "no").
