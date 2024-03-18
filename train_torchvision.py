@@ -104,7 +104,7 @@ def load_model(weight_path: Path, model: models.efficientnet.EfficientNet) -> mo
     """
     loads all parameters of a model
     """
-    checkpoint = torch.load(weight_path, map_location='cpu')
+    checkpoint = torch.load(weight_path)
     model.load_state_dict(checkpoint['state_dict'])
     return model
 
