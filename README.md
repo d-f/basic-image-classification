@@ -102,23 +102,3 @@ Figure 5: Loss on the train and validation datasets throughout training, includi
 | 90.00 %              | 93.75 %     |  1.0    | 92.31 %  | 0.8375        |
 
 Table 4: Model performance on the test dataset.
-
-**Convolutional neural network background:**
-
-Convolutional neural networks work by applying successive convolutional layers to an image to distill it down to a set of feature maps, representing where useful imaging features (such as patterns, shapes, etc.) exist within the image. The filter is applied to the image and moved across with a set value known as stride, which affects the size of the resulting feature map. Convolutional neural networks use the stride to distill down a large image to a set of smaller feature maps. Some known filters can produce effects like highlighting certain imaging features, such as the sobel filter which highlights edges in images. 
-
-![image](https://github.com/d-f/basic-image-classification/assets/118086192/a892de6e-caa3-4fad-a6f7-4a1dfa0a5e7d)
-
-Figure 6: Sobel filter input (source: [https://en.wikipedia.org/wiki/Sobel_operator](https://en.wikipedia.org/wiki/Sobel_operator)): 
-
-![image](https://github.com/d-f/basic-image-classification/assets/118086192/b4dd3d4c-2cdd-43f2-b3ae-9aaa820d4d94)
-
-Figure 7: Sobel filter output (source: [https://en.wikipedia.org/wiki/Sobel_operator](https://en.wikipedia.org/wiki/Sobel_operator)):
-
-The CNN is able to learn which filters would be best to highlight the best imaging features for classifying the input image. By applying successive convolutional layers, the image is able to be broken up heirarchically into a set of features. Even though the filter or kernel of a convolutional layer is normally small compared to the input, the successive nature allows downsteam filters to respond to much larger inputs by taking feature maps as inputs which are themselves compressed in size normally. From the resulting feature maps, a simple neural network known as a fully connected network directly predicts a probability distribution representing the probability that the image is of a certain class. The fully connected network is made up of fully connected layers which consist of at least two layers of nodes connected by linear regression where the weights and biases are learned. Each node in the input layer is connected to every other node in the output layer. In this way, an input layer of arbitrary size can contribute uniformly to a smaller output such as the size of the probability distribution of desired predicted classes.
-
-![image](https://github.com/d-f/basic-image-classification/assets/118086192/377872b6-120d-4c4b-a712-447e2a34fbf5)
-
-Figure 8: Fully connected network with multiple layers (source: [https://www.oreilly.com/library/view/tensorflow-for-deep/9781491980446/ch04.html#ch4-fclayer](https://www.oreilly.com/library/view/tensorflow-for-deep/9781491980446/ch04.html#ch4-fclayer)) 
-
-
