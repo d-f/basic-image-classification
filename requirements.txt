@@ -17,5 +17,5 @@ torchaudio==0.13.1
 torchvision==0.14.1
 tqdm==4.64.1
 typing_extensions==4.5.0
-urllib3==1.26.14
+urllib3==1.26.19
 wincertstore==0.2
